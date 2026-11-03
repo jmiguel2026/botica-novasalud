@@ -37,6 +37,11 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - WATCHPACK_POLLING=true
     stdin_open: true
     tty: true
     depends_on:
