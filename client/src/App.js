@@ -17,7 +17,7 @@ function App() {
         setCargando(false);
       })
       .catch((err) => {
-        console.error('Error:', err);
+        console.error('Error al cargar datos:', err);
         setCargando(false);
       });
   };
@@ -77,6 +77,7 @@ function App() {
         <p>Sistema Centralizado de Inventario, Ventas y Atención al Cliente</p>
       </header>
 
+      {/* Métricas */}
       <section className="dashboard-cards">
         <div className="card">
           <h3>Total Medicamentos</h3>
@@ -94,6 +95,7 @@ function App() {
         </div>
       </section>
 
+      {/* Venta rápida */}
       <section className="tabla-seccion" style={{ marginBottom: '25px' }}>
         <h2>⚡ Atención Rápida - Registrar Venta</h2>
         <form onSubmit={manejarVenta} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
@@ -117,18 +119,44 @@ function App() {
         </form>
       </section>
 
+      {/* Registro y Tabla de Clientes */}
       <section className="tabla-seccion" style={{ marginBottom: '25px' }}>
-        <h2>👥 Registro Rápido de Clientes (Fidelización / Boletas)</h2>
-        <form onSubmit={manejarCliente} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
+        <h2>👥 Registro y Control de Clientes (Fidelización)</h2>
+        <form onSubmit={manejarCliente} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px', marginBottom: '20px' }}>
           <input type="text" name="dni" placeholder="DNI (8 dígitos)" maxLength="8" required style={{ padding: '10px', borderRadius: '5px', width: '160px' }} />
           <input type="text" name="nombre" placeholder="Nombre completo" required style={{ padding: '10px', borderRadius: '5px', flex: '1', minWidth: '200px' }} />
           <input type="text" name="telefono" placeholder="Teléfono" style={{ padding: '10px', borderRadius: '5px', width: '130px' }} />
           <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#0d6efd', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}>
-            ➕ Registrar
+            ➕ Registrar Cliente
           </button>
         </form>
+
+        {/* Tabla visual de Clientes */}
+        {clientes.length > 0 ? (
+          <table className="tabla-botica">
+            <thead>
+              <tr>
+                <th>DNI</th>
+                <th>Nombre Completo</th>
+                <th>Teléfono</th>
+              </tr>
+            </thead>
+            <tbody>
+              {clientes.map((c) => (
+                <tr key={c.id_cliente || c.numero_documento}>
+                  <td>{c.numero_documento}</td>
+                  <td><strong>{c.nombre_completo}</strong></td>
+                  <td>{c.telefono || 'Sin teléfono'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p style={{ color: '#666', fontStyle: 'italic' }}>No hay clientes registrados aún.</p>
+        )}
       </section>
 
+      {/* Control de Inventario y Alertas */}
       <section className="tabla-seccion">
         <h2>📦 Control de Inventario y Alertas</h2>
         {cargando ? (
