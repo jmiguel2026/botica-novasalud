@@ -1,0 +1,93 @@
+/* =====================================================
+   NOVA SALUD · Tema visual (se carga DESPUÉS de App.css)
+   Ubicación: client/src/nova-theme.css
+   ===================================================== */
+
+:root{
+  --brand-900:#06352f; --brand-800:#0a4a41; --brand-600:#0f9d84; --brand-500:#14b8a0;
+  --brand-100:#d9f5ef; --brand-50:#effaf7;
+  --ink:#12263a; --ink-soft:#5b6b7c; --line:#e6ecf1; --bg:#f4f7f9;
+  --danger:#e5484d; --ok:#12a150;
+  --radius:18px;
+  --shadow-sm:0 1px 2px rgba(18,38,58,.05);
+  --shadow-md:0 8px 24px -8px rgba(18,38,58,.12);
+  --shadow-brand:0 10px 24px -8px rgba(15,157,132,.55);
+}
+
+/* ---------- Base ---------- */
+body{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif !important;
+  background:var(--bg) !important;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- Tarjetas de contenido ---------- */
+.content-card{
+  background:#fff !important;
+  border:1px solid var(--line) !important;
+  border-radius:var(--radius) !important;
+  padding:28px 30px !important;
+  box-shadow:var(--shadow-sm) !important;
+  animation:novaFade .35s ease;
+}
+.content-card h2{
+  font-size:19px; font-weight:800; letter-spacing:-.3px; color:var(--ink);
+}
+@keyframes novaFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- Formularios ---------- */
+.form-clean-grid{
+  display:grid !important;
+  grid-template-columns:1fr 1.4fr 1fr auto;
+  gap:16px !important;
+  align-items:end;
+}
+.form-group label{
+  display:block; font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:8px;
+}
+.content-card input,
+.content-card select{
+  width:100%; padding:13px 16px; border-radius:12px;
+  border:1.5px solid var(--line); background:#fbfcfd;
+  font:inherit; font-size:14px; color:var(--ink); outline:0; transition:.2s;
+}
+.content-card input::placeholder{color:#a3afbb}
+.content-card input:focus,
+.content-card select:focus{
+  border-color:var(--brand-500); background:#fff; box-shadow:0 0 0 4px var(--brand-100);
+}
+
+/* ---------- Botón principal ---------- */
+.btn-primary{
+  display:inline-flex !important; align-items:center; justify-content:center; gap:10px;
+  padding:13px 22px !important; border:0 !important; border-radius:12px !important;
+  background:linear-gradient(135deg,var(--brand-500),var(--brand-600)) !important;
+  color:#fff !important; font-weight:700; font-size:14px; font-family:inherit;
+  box-shadow:var(--shadow-brand); transition:.2s; cursor:pointer; white-space:nowrap;
+}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ---------- Tablas ---------- */
+.content-card table{width:100%; border-collapse:collapse}
+.content-card thead th{
+  text-align:left; font-size:11.5px; letter-spacing:.8px; text-transform:uppercase;
+  color:var(--ink-soft); padding:14px 20px; background:#f8fafb;
+  border-bottom:1px solid var(--line);
+}
+.content-card tbody td{
+  padding:16px 20px; font-size:14px; border-bottom:1px solid var(--line);
+}
+.content-card tbody tr{transition:.15s}
+.content-card tbody tr:hover{background:var(--brand-50)}
+
+/* ---------- Responsive ---------- */
+@media(max-width:1100px){.form-clean-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.form-clean-grid{grid-template-columns:1fr}}
+
+/* =====================================================
+   PENDIENTE: sidebar y tarjetas de estadísticas.
+   Necesito los nombres de clase de tu App.js / App.css
+   para estilarlos (ver lista en el chat).
+   ===================================================== */
