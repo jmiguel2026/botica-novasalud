@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import './nova-theme.css';
 
 function App() {
   const [productos, setProductos] = useState([]);
