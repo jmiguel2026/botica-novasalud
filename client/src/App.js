@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import './nova-theme.css';
 
 function App() {
   const [productos, setProductos] = useState([]);
@@ -22,10 +21,6 @@ function App() {
 
   // Cargar Google Material Symbols
   useEffect(() => {
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500;600';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
     cargarDatos();
   }, []);
 
@@ -134,6 +129,8 @@ function App() {
   const productosFiltrados = productos.filter((p) =>
     p.nombre_comercial.toLowerCase().includes(busqueda.toLowerCase())
   );
+
+  const alertas = productos.filter((p) => p.stock_actual <= (p.stock_minimo || 10)).length;
 
   return (
     <div className="layout-dashboard">
@@ -250,7 +247,7 @@ function App() {
               <span className="material-symbols-outlined metrica-icon color-alerta">warning</span>
             </div>
             <p className="metrica-valor color-alerta">
-              {productos.filter((p) => p.stock_actual <= (p.stock_minimo || 10)).length}
+              {alertas}
             </p>
           </div>
 
@@ -284,52 +281,70 @@ function App() {
               </button>
             </div>
 
-            <table className="tabla-clean">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Medicamento</th>
-                  <th>Precio Venta</th>
-                  <th>Stock Actual</th>
-                  <th>Stock Mínimo</th>
-                  <th>Estado</th>
-                  <th>Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                {productosFiltrados.map((p) => {
-                  const bajoStock = p.stock_actual <= (p.stock_minimo || 10);
-                  return (
-                    <tr key={p.id_producto} className={bajoStock ? 'row-alerta' : ''}>
-                      <td><strong>#{p.id_producto}</strong></td>
-                      <td>{p.nombre_comercial}</td>
-                      <td>S/ {Number(p.precio_venta).toFixed(2)}</td>
-                      <td>{p.stock_actual} und.</td>
-                      <td>{p.stock_minimo || 10} und.</td>
-                      <td>
-                        {bajoStock ? (
-                          <span className="badge-pill badge-danger">
-                            <span className="material-symbols-outlined icon-badge">error</span>
-                            Reposición Urgente
-                          </span>
-                        ) : (
-                          <span className="badge-pill badge-success">
-                            <span className="material-symbols-outlined icon-badge">check_circle</span>
-                            Stock Óptimo
-                          </span>
-                        )}
-                      </td>
-                      <td>
-                        <button className="btn-icon-action" onClick={() => abrirModalEditar(p)} title="Editar Medicamento">
-                          <span className="material-symbols-outlined">edit</span>
-                          <span>Editar</span>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="table-wrap">
+              <table className="tabla-clean">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Medicamento</th>
+                    <th>Precio Venta</th>
+                    <th>Stock Actual</th>
+                    <th>Stock Mínimo</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {productosFiltrados.map((p) => {
+                    const min = p.stock_minimo || 10;
+                    const bajoStock = p.stock_actual <= min;
+                    const pct = Math.min(100, Math.round((p.stock_actual / (min * 3)) * 100));
+                    return (
+                      <tr key={p.id_producto} className={bajoStock ? 'row-alerta' : ''}>
+                        <td><strong className="id-tag">#{p.id_producto}</strong></td>
+                        <td>
+                          <div className="med-cell">
+                            <span className="med-avatar">{p.nombre_comercial.slice(0, 2)}</span>
+                            {p.nombre_comercial}
+                          </div>
+                        </td>
+                        <td className="precio">S/ {Number(p.precio_venta).toFixed(2)}</td>
+                        <td>
+                          <strong>{p.stock_actual} und.</strong>
+                          <div className={`stockbar ${bajoStock ? 'danger' : ''}`}>
+                            <span style={{ width: `${pct}%` }} />
+                          </div>
+                        </td>
+                        <td>{min} und.</td>
+                        <td>
+                          {bajoStock ? (
+                            <span className="badge-pill badge-danger">
+                              <span className="material-symbols-outlined icon-badge">error</span>
+                              Reposición Urgente
+                            </span>
+                          ) : (
+                            <span className="badge-pill badge-success">
+                              <span className="material-symbols-outlined icon-badge">check_circle</span>
+                              Stock Óptimo
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          <button
+                            className="btn-icon-action"
+                            onClick={() => abrirModalEditar(p)}
+                            title="Editar Medicamento"
+                          >
+                            <span className="material-symbols-outlined">edit</span>
+                            <span>Editar</span>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </section>
         )}
 
@@ -357,11 +372,14 @@ function App() {
 
               <div className="form-group">
                 <label>Método de Pago</label>
-                <select name="tipo_pago">
-                  <option value="Efectivo">Efectivo</option>
-                  <option value="Yape / Plin">Yape / Plin</option>
-                  <option value="Tarjeta">Tarjeta</option>
-                </select>
+                <div className="pay-options">
+                  {['Efectivo', 'Yape / Plin', 'Tarjeta'].map((m, i) => (
+                    <label key={m} className="pay-option">
+                      <input type="radio" name="tipo_pago" value={m} defaultChecked={i === 0} />
+                      <span>{m}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div className="form-group align-bottom">
@@ -378,36 +396,47 @@ function App() {
         {pestanaActiva === 'historial' && (
           <section className="content-card">
             <h2>Tabla de Ventas Registradas</h2>
-            <table className="tabla-clean">
-              <thead>
-                <tr>
-                  <th>N° Venta</th>
-                  <th>Medicamento</th>
-                  <th>Cantidad</th>
-                  <th>Método de Pago</th>
-                  <th>Total Cobrado</th>
-                  <th>Fecha y Hora</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ventas.length === 0 ? (
+            <div className="table-wrap">
+              <table className="tabla-clean">
+                <thead>
                   <tr>
-                    <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>No hay ventas registradas aún.</td>
+                    <th>N° Venta</th>
+                    <th>Medicamento</th>
+                    <th>Cantidad</th>
+                    <th>Método de Pago</th>
+                    <th>Total Cobrado</th>
+                    <th>Fecha y Hora</th>
                   </tr>
-                ) : (
-                  ventas.map((v) => (
-                    <tr key={v.id_venta}>
-                      <td><strong>VNT-00{v.id_venta}</strong></td>
-                      <td>{v.nombre_producto}</td>
-                      <td>{v.cantidad} unidades</td>
-                      <td><span className="metodo-tag">{v.tipo_pago}</span></td>
-                      <td><strong>S/ {Number(v.total).toFixed(2)}</strong></td>
-                      <td>{new Date(v.fecha).toLocaleString()}</td>
+                </thead>
+                <tbody>
+                  {ventas.length === 0 ? (
+                    <tr>
+                      <td colSpan="6">
+                        <div className="empty-state">
+                          <span className="material-symbols-outlined">receipt_long</span>
+                          <strong>No hay ventas registradas aún</strong>
+                          <p>Cuando cobres tu primera venta aparecerá aquí.</p>
+                          <button type="button" className="btn-primary" onClick={() => setPestanaActiva('ventas')}>
+                            Ir al Punto de Venta
+                          </button>
+                        </div>
+                      </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    ventas.map((v) => (
+                      <tr key={v.id_venta}>
+                        <td><strong>VNT-00{v.id_venta}</strong></td>
+                        <td>{v.nombre_producto}</td>
+                        <td>{v.cantidad} unidades</td>
+                        <td><span className="metodo-tag">{v.tipo_pago}</span></td>
+                        <td><strong>S/ {Number(v.total).toFixed(2)}</strong></td>
+                        <td>{new Date(v.fecha).toLocaleString()}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </section>
         )}
 
